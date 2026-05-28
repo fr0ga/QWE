@@ -4,7 +4,11 @@ const spells = {
     "Sun Strike": "EEE",
     "Tornado": "WWQ",
     "Chaos Meteor": "EEW",
-    "Deafening Blast": "QWE"
+    "Deafening Blast": "QWE",
+    "Ice Wall": "QQE",
+    "Forge Spirit": "EEQ",
+    "Ghost Walk": "QQW",
+    "Alacrity": "WWE"
 };
 
 let orbSequence = "";
