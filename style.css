@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    background: #111;
+    color: #fff;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+header, footer {
+    padding: 10px;
+}
+
+.game-area {
+    margin: 20px auto;
+    width: 600px;
+    height: 400px;
+    background: #222;
+    border: 2px solid #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+#invoker {
+     height: 80px;          /* фиксируем высоту */
+     width: auto;           /* ширина подстраивается */
+     position: absolute;
+     bottom: 20px;
+     right: 20px;
+ }
+
+#enemy {
+    height: 72px;          /* фиксируем высоту под оригинал */
+    width: auto;           /* ширина сохраняет пропорцию */
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    transition: opacity 0.5s ease;
+}
+
+
+#spell-display {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+#orbs {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: yellow;
+}
