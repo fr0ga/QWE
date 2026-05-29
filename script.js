@@ -11,7 +11,6 @@ const spells = {
     "Alacrity": "WWE"
 };
 
-// соответствие спеллов и файлов
 const spellImages = {
     "Cold Snap": "invoker_cold_snap.png",
     "EMP": "invoker_emp.png",
@@ -40,7 +39,7 @@ const message = document.getElementById("message");
 const invoker = document.getElementById("invoker");
 
 function showMessage(text, color = "yellow") {
-    message.textContent = text;
+    message.innerHTML = text.replace(/\n/g, "<br>");
     message.style.color = color;
 }
 
@@ -65,7 +64,7 @@ function castSpellEffect(spellName) {
 
     setTimeout(() => {
         img.remove();
-    }, 1000); // исчезает через 1 сек
+    }, 1000);
 }
 
 // Новый спелл
@@ -144,27 +143,26 @@ function loseGame() {
     const statsPanel = document.getElementById("stats-panel");
     statsPanel.innerHTML = `<h3>Статистика</h3>
         <p>Очки: ${score}</p>
+        <p>Всего спеллов: ${totalSpells}</p>
         <p>Среднее время: ${avgTime} мс</p>
-        <h4>По спеллам:</h4>`;
+        <h4>Среднее по спеллам</h4>`;
 
     for (let spell in spellStats) {
         const avg = (spellStats[spell].totalTime / spellStats[spell].count).toFixed(0);
-        statsPanel.innerHTML += `<p>${spell}: ${avg} мс</p>`;
+        statsPanel.innerHTML += `<p>${spell}: ${avg} мс (всего ${spellStats[spell].count})</p>`;
     }
 
-    showMessage("Крип дошёл до Инвокера!" +
-        "\nНажми любую кнопку для рестарта.", "red");
+    showMessage("Крип дошёл до Инвокера!\nНажми любую кнопку для рестарта.", "red");
 
     document.addEventListener("keydown", () => {
         score = 0;
         spellStats = {};
         gameOver = false;
-        statsPanel.innerHTML = ""; // очищаем статистику
+        statsPanel.innerHTML = "";
         newSpell();
         moveEnemy();
     }, { once: true });
 }
-
 
 // Движение врага
 function moveEnemy() {
