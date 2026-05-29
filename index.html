@@ -10,16 +10,23 @@
     <h1>Invoker Trainer</h1>
 </header>
 
-<div class="game-area">
-    <img id="invoker" src="images/invoker.png" alt="Invoker">
-    <img id="enemy" src="images/creep.png" alt="Creep">
-    <div id="spell-display">Заклинание: <span id="current-spell"></span></div>
-    <div id="orbs">Орбы: <span id="orb-sequence"></span></div>
-    <div id="message"></div>
+<div class="layout">
+    <!-- Панель статистики -->
+    <div id="stats-panel"></div>
+
+    <!-- Игровая область -->
+    <div class="game-area">
+        <img id="invoker" src="images/invoker.png" alt="Invoker">
+        <img id="enemy" src="images/creep.png" alt="Creep">
+        <div id="spell-display">Заклинание: <span id="current-spell"></span></div>
+        <div id="orbs">Орбы: <span id="orb-sequence"></span></div>
+        <div id="message"></div>
+    </div>
 </div>
 
+
 <footer>
-    <p>Клавиши: Q=Wex, W=Quas, E=Exort, R=Invoke, D/F=каст</p>
+    <p>Клавиши: Q=Wex, W=Quas, E=Exort, R=Invoke, D=каст</p>
 </footer>
 
 <script src="script.js"></script>

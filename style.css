@@ -10,23 +10,13 @@ header, footer {
     padding: 10px;
 }
 
-.game-area {
-    margin: 20px auto;
-    width: 600px;
-    height: 400px;
-    background: #222;
-    border: 2px solid #fff;
-    position: relative;
-    overflow: hidden;
-}
-
 #invoker {
-     height: 80px;          /* фиксируем высоту */
-     width: auto;           /* ширина подстраивается */
-     position: absolute;
-     bottom: 20px;
-     right: 20px;
- }
+    height: 80px;          /* фиксируем высоту */
+    width: auto;           /* ширина подстраивается */
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
 
 #enemy {
     height: 72px;          /* фиксируем высоту под оригинал */
@@ -37,7 +27,6 @@ header, footer {
     transform: translateY(-50%);
     transition: opacity 0.5s ease;
 }
-
 
 #spell-display {
     margin-top: 20px;
@@ -54,4 +43,38 @@ header, footer {
     font-size: 22px;
     font-weight: bold;
     color: yellow;
+}
+
+.spell-effect {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    opacity: 1;
+    transition: transform 1s linear, opacity 1s linear;
+    pointer-events: none;
+}
+
+/* игровая область строго по центру */
+.game-area {
+    width: 600px;
+    height: 400px;
+    background: #222;
+    border: 2px solid #fff;
+    position: relative;
+    overflow: hidden;
+    margin: 20px auto;   /* центрируем по горизонтали */
+}
+
+/* панель статистики чуть левее игры */
+#stats-panel {
+    position: absolute;
+    left: calc(50% - 600px/2 - 240px); /* центр - половина ширины игры - ширина панели - зазор */
+    top: 120px;                        /* вертикальное смещение */
+    width: 220px;
+    min-height: 400px;
+    background: #111;
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    font-size: 16px;
 }
