@@ -152,7 +152,8 @@ function loseGame() {
         statsPanel.innerHTML += `<p>${spell}: ${avg} мс</p>`;
     }
 
-    showMessage("Крип дошёл до Инвокера! Нажми любую кнопку для рестарта.", "red");
+    showMessage("Крип дошёл до Инвокера!" +
+        "\nНажми любую кнопку для рестарта.", "red");
 
     document.addEventListener("keydown", () => {
         score = 0;
