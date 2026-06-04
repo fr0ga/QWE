@@ -25,13 +25,15 @@ const spellImages = {
 };
 
 let orbSequence = "";
-let invokedCombo = "";
 let currentSpell = null;
 let spellStartTime = 0;
 let score = 0;
 let spellStats = {};
 let gameOver = false;
 let enemyAnimationId = null;
+
+let spellSlotD = null;
+let spellSlotF = null;
 
 const orbDisplay = document.getElementById("orb-sequence");
 const spellDisplay = document.getElementById("current-spell");
@@ -107,7 +109,6 @@ function newSpell() {
     spellStartTime = Date.now();
     enemyStartTime = Date.now();
 
-    // увеличиваем счётчик и уменьшаем время
     spellCount++;
     enemyDuration = Math.max(2500, baseDuration - decrement * (spellCount - 1));
 
@@ -124,7 +125,7 @@ function countLetters(str) {
 }
 
 // Проверка заклинания
-function checkSpell() {
+function checkSpell(invokedCombo) {
     if (gameOver || !invokedCombo) return;
 
     const required = countLetters(spells[currentSpell]);
@@ -161,7 +162,6 @@ function checkSpell() {
         spellStats[currentSpell].totalTime += timeTaken;
         spellStats[currentSpell].count++;
 
-        invokedCombo = "";
         setTimeout(newSpell, 500);
     } else {
         showMessage("Неверное заклинание!", "red");
@@ -204,8 +204,8 @@ function loseGame() {
         gameOver = false;
         if (statsPanel) statsPanel.innerHTML = "";
         orbSequence = "";
-        invokedCombo = "";
-        orbDisplay.textContent = "";
+        spellSlotD = null;
+        spellSlotF = null;
         spellCount = 0;
         enemyDuration = baseDuration;
         newSpell();
@@ -244,10 +244,16 @@ document.addEventListener("keydown", (e) => {
             orbSequence += "E";
             break;
         case "KeyR":
-            invokedCombo = orbSequence;
+            spellSlotF = spellSlotD;
+            spellSlotD = orbSequence;
             break;
         case "KeyD":
-            checkSpell();
+        case "KeyT": // дубль D
+            checkSpell(spellSlotD);
+            break;
+        case "KeyF":
+        case "KeyY": // дубль F
+            checkSpell(spellSlotF);
             break;
     }
 
