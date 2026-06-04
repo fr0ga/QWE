@@ -26,6 +26,7 @@ const spellImages = {
 
 let orbSequence = "";
 let currentSpell = null;
+let lastSpell = null; // хранит предыдущий выбранный спелл
 let spellStartTime = 0;
 let score = 0;
 let spellStats = {};
@@ -34,7 +35,7 @@ let enemyAnimationId = null;
 
 let spellSlotD = null;
 let spellSlotF = null;
-let lastSuccessfulSpell = null; // хранит последний успешный спелл
+let lastSuccessfulSpell = null; // хранит последний успешно кастованный спелл
 
 const orbDisplay = document.getElementById("orb-sequence");
 const spellDisplay = document.getElementById("current-spell");
@@ -85,7 +86,15 @@ function newSpell() {
     if (gameOver) return;
 
     const keys = Object.keys(spells);
-    currentSpell = keys[Math.floor(Math.random() * keys.length)];
+    let newChoice;
+
+    // выбираем случайный спелл, пока он не отличается от предыдущего
+    do {
+        newChoice = keys[Math.floor(Math.random() * keys.length)];
+    } while (newChoice === lastSpell);
+
+    currentSpell = newChoice;
+    lastSpell = currentSpell;
 
     spellDisplay.innerHTML = "";
     const textNode = document.createElement("span");
@@ -218,6 +227,7 @@ function loseGame() {
             spellCount = 0;
             enemyDuration = baseDuration;
             lastSuccessfulSpell = null;
+            lastSpell = null;
             newSpell();
         }
     }, { once: true });
