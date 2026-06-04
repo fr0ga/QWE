@@ -110,7 +110,7 @@ function newSpell() {
     enemyStartTime = Date.now();
 
     spellCount++;
-    enemyDuration = Math.max(2500, baseDuration - decrement * (spellCount - 1));
+    enemyDuration = Math.max(1500, baseDuration - decrement * (spellCount - 1));
 
     moveEnemy();
 }
