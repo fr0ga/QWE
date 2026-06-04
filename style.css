@@ -79,3 +79,11 @@ header, footer {
     text-align: left;
     font-size: 16px;
 }
+
+.spell-icon {
+    width: 32px;
+    height: 32px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+

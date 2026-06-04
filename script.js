@@ -31,6 +31,7 @@ let spellStartTime = 0;
 let score = 0;
 let spellStats = {};
 let gameOver = false;
+let enemyAnimationId = null;
 
 const orbDisplay = document.getElementById("orb-sequence");
 const spellDisplay = document.getElementById("current-spell");
@@ -43,7 +44,7 @@ function showMessage(text, color = "yellow") {
     message.style.color = color;
 }
 
-// ✨ Анимация картинки спела
+// Анимация картинки спела
 function castSpellEffect(spellName) {
     const img = document.createElement("img");
     img.src = `images/${spellImages[spellName]}`;
@@ -67,19 +68,50 @@ function castSpellEffect(spellName) {
     }, 1000);
 }
 
+// Настройки таймера
+let spellCount = 0;
+const baseDuration = 10000; // 10 секунд
+const decrement = 750;      // минус 0.75 секунды
+let enemyDuration = baseDuration;
+let enemyStartTime = 0;
+const startPos = 10;
+const endPos = 500;
+
 // Новый спелл
 function newSpell() {
     if (gameOver) return;
+
     const keys = Object.keys(spells);
     currentSpell = keys[Math.floor(Math.random() * keys.length)];
-    spellDisplay.textContent = currentSpell;
-    orbSequence = "";
-    invokedCombo = "";
-    orbDisplay.textContent = orbSequence;
+
+    spellDisplay.innerHTML = "";
+    const textNode = document.createElement("span");
+    textNode.textContent = currentSpell;
+    const icon = document.createElement("img");
+    icon.src = `images/${spellImages[currentSpell]}`;
+    icon.alt = currentSpell;
+    icon.classList.add("spell-icon");
+    spellDisplay.appendChild(textNode);
+    spellDisplay.appendChild(icon);
+
+    if (enemyAnimationId) {
+        cancelAnimationFrame(enemyAnimationId);
+    }
+    enemy.style.transition = "none";
     enemy.style.left = "10px";
     enemy.style.opacity = "1";
+    enemy.offsetHeight;
+
     showMessage("Собери заклинание!", "yellow");
+
     spellStartTime = Date.now();
+    enemyStartTime = Date.now();
+
+    // увеличиваем счётчик и уменьшаем время
+    spellCount++;
+    enemyDuration = Math.max(2500, baseDuration - decrement * (spellCount - 1));
+
+    moveEnemy();
 }
 
 // Считаем буквы
@@ -93,7 +125,7 @@ function countLetters(str) {
 
 // Проверка заклинания
 function checkSpell() {
-    if (gameOver) return;
+    if (gameOver || !invokedCombo) return;
 
     const required = countLetters(spells[currentSpell]);
     const actual = countLetters(invokedCombo);
@@ -108,14 +140,19 @@ function checkSpell() {
 
     if (ok) {
         showMessage("Заклинание успешно! Враг уничтожен.", "lime");
-
         castSpellEffect(currentSpell);
-        enemy.style.transition = "opacity 1s linear";
+
+        if (enemyAnimationId) {
+            cancelAnimationFrame(enemyAnimationId);
+            enemyAnimationId = null;
+        }
+
+        enemy.style.transition = "opacity 0.5s linear";
         enemy.style.opacity = "0";
 
         const now = Date.now();
         const timeTaken = now - spellStartTime;
-        const timeLeft = Math.max(0, 10000 - timeTaken); // крип идёт 10 сек
+        const timeLeft = Math.max(0, enemyDuration - timeTaken);
         score += timeLeft;
 
         if (!spellStats[currentSpell]) {
@@ -124,7 +161,8 @@ function checkSpell() {
         spellStats[currentSpell].totalTime += timeTaken;
         spellStats[currentSpell].count++;
 
-        setTimeout(newSpell, 1000);
+        invokedCombo = "";
+        setTimeout(newSpell, 500);
     } else {
         showMessage("Неверное заклинание!", "red");
     }
@@ -132,6 +170,10 @@ function checkSpell() {
 
 function loseGame() {
     gameOver = true;
+    if (enemyAnimationId) {
+        cancelAnimationFrame(enemyAnimationId);
+        enemyAnimationId = null;
+    }
 
     let totalSpells = 0, totalTime = 0;
     for (let spell in spellStats) {
@@ -141,15 +183,17 @@ function loseGame() {
     const avgTime = totalSpells ? (totalTime / totalSpells).toFixed(0) : 0;
 
     const statsPanel = document.getElementById("stats-panel");
-    statsPanel.innerHTML = `<h3>Статистика</h3>
-        <p>Очки: ${score}</p>
-        <p>Всего спеллов: ${totalSpells}</p>
-        <p>Среднее время: ${avgTime} мс</p>
-        <h4>Среднее по спеллам</h4>`;
+    if (statsPanel) {
+        statsPanel.innerHTML = `<h3>Статистика</h3>
+            <p>Очки: ${score}</p>
+            <p>Всего спеллов: ${totalSpells}</p>
+            <p>Среднее время: ${avgTime} мс</p>
+            <h4>Среднее по спеллам</h4>`;
 
-    for (let spell in spellStats) {
-        const avg = (spellStats[spell].totalTime / spellStats[spell].count).toFixed(0);
-        statsPanel.innerHTML += `<p>${spell}: ${avg} мс (всего ${spellStats[spell].count})</p>`;
+        for (let spell in spellStats) {
+            const avg = (spellStats[spell].totalTime / spellStats[spell].count).toFixed(0);
+            statsPanel.innerHTML += `<p>${spell}: ${avg} мс (всего ${spellStats[spell].count})</p>`;
+        }
     }
 
     showMessage("Крип дошёл до Инвокера!\nНажми любую кнопку для рестарта.", "red");
@@ -158,44 +202,60 @@ function loseGame() {
         score = 0;
         spellStats = {};
         gameOver = false;
-        statsPanel.innerHTML = "";
+        if (statsPanel) statsPanel.innerHTML = "";
+        orbSequence = "";
+        invokedCombo = "";
+        orbDisplay.textContent = "";
+        spellCount = 0;
+        enemyDuration = baseDuration;
         newSpell();
-        moveEnemy();
     }, { once: true });
 }
 
-// Движение врага
+// Движение врага по таймеру
 function moveEnemy() {
     if (gameOver) return;
 
-    let pos = parseInt(enemy.style.left);
-    if (pos < 500) {
-        enemy.style.left = pos + 2 + "px";
+    const now = Date.now();
+    const elapsed = now - enemyStartTime;
+
+    if (elapsed < enemyDuration) {
+        const progress = elapsed / enemyDuration;
+        const pos = startPos + (endPos - startPos) * progress;
+        enemy.style.left = pos + "px";
+        enemyAnimationId = requestAnimationFrame(moveEnemy);
     } else {
         loseGame();
-        return;
     }
-    requestAnimationFrame(moveEnemy);
 }
 
-// Обработка клавиш
+// Обработка клавиш (независимо от раскладки)
 document.addEventListener("keydown", (e) => {
-    const key = e.key.toLowerCase();
+    if (gameOver) return;
 
-    if (["q", "w", "e"].includes(key)) {
-        orbSequence += key.toUpperCase();
-        orbDisplay.textContent = orbSequence;
+    switch (e.code) {
+        case "KeyQ":
+            orbSequence += "Q";
+            break;
+        case "KeyW":
+            orbSequence += "W";
+            break;
+        case "KeyE":
+            orbSequence += "E";
+            break;
+        case "KeyR":
+            invokedCombo = orbSequence;
+            break;
+        case "KeyD":
+            checkSpell();
+            break;
     }
 
-    if (key === "r") {
-        invokedCombo = orbSequence.slice(-3);
+    if (orbSequence.length > 3) {
+        orbSequence = orbSequence.slice(-3);
     }
-
-    if (key === "d") {
-        checkSpell();
-    }
+    orbDisplay.textContent = orbSequence;
 });
 
 // Запуск игры
 newSpell();
-moveEnemy();
