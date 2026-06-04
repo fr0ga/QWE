@@ -34,6 +34,7 @@ let enemyAnimationId = null;
 
 let spellSlotD = null;
 let spellSlotF = null;
+let lastSuccessfulSpell = null; // хранит последний успешный спелл
 
 const orbDisplay = document.getElementById("orb-sequence");
 const spellDisplay = document.getElementById("current-spell");
@@ -110,7 +111,7 @@ function newSpell() {
     enemyStartTime = Date.now();
 
     spellCount++;
-    enemyDuration = Math.max(750, baseDuration - decrement * (spellCount - 1));
+    enemyDuration = Math.max(2500, baseDuration - decrement * (spellCount - 1));
 
     moveEnemy();
 }
@@ -139,6 +140,12 @@ function checkSpell(invokedCombo) {
         }
     }
 
+    // запрещаем повторный каст того же спелла
+    if (ok && currentSpell === lastSuccessfulSpell) {
+        showMessage("Этот спелл уже был успешно применён!", "orange");
+        return;
+    }
+
     if (ok) {
         showMessage("Заклинание успешно! Враг уничтожен.", "lime");
         castSpellEffect(currentSpell);
@@ -161,6 +168,8 @@ function checkSpell(invokedCombo) {
         }
         spellStats[currentSpell].totalTime += timeTaken;
         spellStats[currentSpell].count++;
+
+        lastSuccessfulSpell = currentSpell;
 
         setTimeout(newSpell, 500);
     } else {
@@ -196,19 +205,21 @@ function loseGame() {
         }
     }
 
-    showMessage("Крип дошёл до Инвокера!\nНажми любую кнопку для рестарта.", "red");
+    showMessage("Крип дошёл до Инвокера!\nНажми Enter для рестарта.", "red");
 
-    document.addEventListener("keydown", () => {
-        score = 0;
-        spellStats = {};
-        gameOver = false;
-        if (statsPanel) statsPanel.innerHTML = "";
-        orbSequence = "";
-        spellSlotD = null;
-        spellSlotF = null;
-        spellCount = 0;
-        enemyDuration = baseDuration;
-        newSpell();
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "Enter") {
+            score = 0;
+            spellStats = {};
+            gameOver = false;
+            orbSequence = "";
+            spellSlotD = null;
+            spellSlotF = null;
+            spellCount = 0;
+            enemyDuration = baseDuration;
+            lastSuccessfulSpell = null;
+            newSpell();
+        }
     }, { once: true });
 }
 
