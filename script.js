@@ -120,7 +120,7 @@ function newSpell() {
     enemyStartTime = Date.now();
 
     spellCount++;
-    enemyDuration = Math.max(2500, baseDuration - decrement * (spellCount - 1));
+    enemyDuration = Math.max(500, baseDuration - decrement * (spellCount - 1));
 
     moveEnemy();
 }
@@ -216,8 +216,10 @@ function loseGame() {
 
     showMessage("Крип дошёл до Инвокера!\nНажми Enter для рестарта.", "red");
 
-    document.addEventListener("keydown", (e) => {
+    // слушаем только Enter
+    const restartHandler = (e) => {
         if (e.code === "Enter") {
+            document.removeEventListener("keydown", restartHandler); // удаляем обработчик
             score = 0;
             spellStats = {};
             gameOver = false;
@@ -230,8 +232,11 @@ function loseGame() {
             lastSpell = null;
             newSpell();
         }
-    }, { once: true });
+    };
+
+    document.addEventListener("keydown", restartHandler);
 }
+
 
 // Движение врага по таймеру
 function moveEnemy() {
